@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DaniWorld Bossmenu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+</head>
+
+<body>
+    <div class="application-container" id="application-container" style="display: none;">
+        <!-- Header section -->
+        <div class="application-header">
+            <div class="police-emblem"></div>
+            <h2 class="application-title">Formulaire d'embauche</h2>
+            <p class="application-subtitle">Rejoignez l'équipe du LSPD !</p>
+        </div>
+    
+        <!-- Progress bar -->
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+    
+        <!-- Form content -->
+        <div class="application-content">
+            <div class="intro-text">
+                <p>Merci de votre intérêt pour rejoindre la police. Veuillez remplir soigneusement tous les champs de ce formulaire de candidature.</p>
+                <p>Les champs obligatoires sont marqués d'un astérisque <span class="required-label"></span></p>
+            </div>
+    
+            <div class="application-question" id="application-question">
+                Pourquoi souhaitez-vous rejoindre le département de police?<span class="application-question-required" id="application-question-required"></span>
+            </div>
+    
+            <textarea class="application-input" id="application-input_text" placeholder="Saisissez votre réponse ici..."></textarea>
+            <input type="number" id="application-input_number">
+            <select id="application-input_select">
+                <option>bolbol</option>
+            </select>
+
+            <div class="badge-watermark"></div>
+        </div>
+    
+        <!-- Buttons section -->
+        <div class="application-buttons">
+            <button class="btn-cancel" id="cancel_app">Annuler</button>
+            <button class="btn-next" id="finish_task">Terminer</button>
+        </div>
+    </div>
+    <div id="container" class="container" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-logo">DW</div>
+            <a class="nav-item active" data-page="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Tableau de bord</span>
+            </a>
+            <a class="nav-item" data-page="employees">
+                <i class="fas fa-users"></i>
+                <span>Employés</span>
+            </a>
+            <a class="nav-item" data-page="society">
+                <i class="fas fa-coins"></i>
+                <span>Société</span>
+            </a>
+            <a class="nav-item" data-page="permissions">
+                <i class="fas fa-key"></i>
+                <span>Permissions</span>
+            </a>
+            <a class="nav-item" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Paramètres</span>
+            </a>
+            <a class="nav-item" style="margin-top: auto;" id="close-ui">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Fermer</span>
+            </a>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard-page">
+                <header>
+                    <div class="header-title">
+                        <h1 id="department-title">Tableau de bord</h1>
+                        <p id="employees-count">Gestion de 0 employé</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" id="refresh-data-btn">
+                            <i class="fas fa-sync-alt"></i> Actualiser les données
+                        </button>
+                    </div>
+                </header>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-title">Nombre total d'employés</div>
+                        <div class="stat-card-value" id="total-employees">0</div>
+                        <div class="stat-card-trend">
+                            <i class="fas fa-users"></i> <span id="status-online">0</span> actuellement en ligne
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">Heures de travail moyennes</div>
+                        <div class="stat-card-value" id="avg-hours">0</div>
+                        <div class="stat-card-trend">
+                            <i class="fas fa-clock"></i> heures par employé par semaine
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">Rang le plus élevé</div>
+                        <div class="stat-card-value" id="highest-grade">-</div>
+                        <div class="stat-card-trend">
+                            <i class="fas fa-star"></i> <span id="highest-grade-count">0</span> employés à ce rang
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">Rang le plus courant</div>
+                        <div class="stat-card-value" id="common-grade">-</div>
+                        <div class="stat-card-trend">
+                            <i class="fas fa-user-friends"></i> <span id="common-grade-count">0</span> employés à ce rang
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Aperçu des activités - Par heure</div>
+                            <div class="chart-actions">
+                                <div class="chart-action" id="download-activity"><i class="fas fa-download"></i></div>
+                                <div class="chart-action" id="expand-activity"><i class="fas fa-expand"></i></div>
+                            </div>
+                        </div>
+                        <div class="activity-chart" id="activity-chart">
+                            <!-- Generated dynamically by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Employés en ligne</div>
+                            <div class="chart-actions">
+                                <div class="chart-action" id="refresh-online"><i class="fas fa-sync-alt"></i></div>
+                            </div>
+                        </div>
+                        <div class="employee-list" id="online-employees">
+                            <!-- Generated dynamically by JavaScript -->
+                            <div class="empty-list">Aucun employé actuellement en ligne</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">Liste des employés</div>
+                        <div class="table-actions">
+                            <input type="text" id="search-employee" placeholder="Rechercher des candidatures...">
+                        </div>
+                    </div>
+                    <table width="100%">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Rang</th>
+                                <th>Statut</th>
+                                <th class="location-column">Emplacement</th>
+                                <th class="playtime-column">Temps de jeu</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-table">
+                            <!-- Generated dynamically by JavaScript -->
+                            <tr>
+                                <td colspan="6" class="empty-table">Chargement des données...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Employees Page -->
+            <div class="page" id="employees-page">
+                <header>
+                    <div class="header-title">
+                        <h1>Gestion des employés</h1>
+                        <p id="employees-management-count">Gestion de 0 employé</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="hire-employee-btn">
+                            <i class="fas fa-user-plus"></i> Embaucher un employé
+                        </button>
+                    </div>
+                </header>
+
+                <div class="employee-management">
+                    <div class="tabs">
+                        <div class="tab active" data-filter="all">Tous</div>
+                        <div class="tab" data-filter="online">En Ligne</div>
+                        <div class="tab" data-filter="offline">Hors Ligne</div>
+                        <div class="tab" data-filter="management">Gestion</div>
+                    </div>
+
+                    <input type="text" id="search-management-employee" placeholder="Rechercher des employés...">
+
+                    <div class="table-container">
+                        <table width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Rang</th>
+                                    <th>Statut</th>
+                                    <th class="playtime-column">Temps de jeu</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="management-employees-table">
+                                <!-- Generated dynamically by JavaScript -->
+                                <tr>
+                                    <td colspan="5" class="empty-table">Chargement des données...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="society-page">
+                <header>
+                    <div class="header-title">
+                        <h1><i class="fas fa-coins"></i> Gestion de la société</h1>
+                        <p>Gérez les finances de votre organisation de manière sûre et efficace.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" id="refresh-society-btn">
+                            <i class="fas fa-sync-alt"></i> Actualiser
+                        </button>
+                    </div>
+                </header>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card society-balance-card">
+                        <div class="stat-card-title">Fonds de la société</div>
+                        <div class="stat-card-value" id="society-balance">$0</div>
+                        <div class="stat-card-trend">
+                            <i class="fas fa-wallet"></i> <span id="society-name">Chargement...</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">Dernière transactions</div>
+                        <div class="stat-card-value" id="last-transaction-amount">$0</div>
+                        <div class="stat-card-trend">
+                            <i class="fas fa-clock"></i> <span id="last-transaction-time">Aucune transaction récente</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">L'activité du jour</div>
+                        <div class="stat-card-value" id="today-transactions">0</div>
+                        <div class="stat-card-trend">
+                            <i class="fas fa-exchange-alt"></i> <span id="today-transactions-amount">$0</span> montant total
+                        </div>
+                    </div>
+                </div>
+
+<div class="society-actions-container">
+    <div class="chart-container society-chart-container">
+        <div class="chart-header">
+            <div class="chart-title">Activité transactionnelle</div>
+            <div class="chart-actions">
+                <div class="dropdown">
+                    <button id="timeframe-selector" class="dropdown-btn">
+                        <span>Derniers 7 jours</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div id="timeframe-dropdown" class="dropdown-content">
+                        <a href="#" data-timeframe="day">Aujourd'hui</a>
+                        <a href="#" data-timeframe="week">Derniers 7 jours</a>
+                        <a href="#" data-timeframe="month">Derniers 30 jours</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="transactions-chart" class="transactions-chart"></div>
+    </div>
+
+    <div class="society-actions-row">
+        <div class="society-action-card">
+            <div class="society-card-title">
+                <i class="fas fa-arrow-circle-up"></i> Déposer de l'argent
+            </div>
+            <div class="form-group">
+                <label for="deposit-amount">Montant à déposer</label>
+                <input type="number" id="deposit-amount" min="1" placeholder="Montant à déposer">
+            </div>
+            <button class="btn btn-primary" id="deposit-btn">
+                <i class="fas fa-arrow-circle-up"></i> Déposer des fonds
+            </button>
+        </div>
+
+        <div class="society-action-card">
+            <div class="society-card-title">
+                <i class="fas fa-arrow-circle-down"></i> Retirer de l'argent
+            </div>
+            <div class="form-group">
+                <label for="withdraw-amount">Montant à retirer</label>
+                <input type="number" id="withdraw-amount" min="1" placeholder="Montant à retirer">
+            </div>
+            <button class="btn btn-primary" id="withdraw-btn">
+                <i class="fas fa-arrow-circle-down"></i> Retirer des fonds
+            </button>
+        </div>
+
+        <div class="society-action-card">
+            <div class="society-card-title">
+                <i class="fas fa-exchange-alt"></i> Transfert à l'employé
+            </div>
+            <div class="form-group">
+                <label for="transfer-employee">Sélectionnez un employé</label>
+                <select id="transfer-employee">
+                    <!-- Options will be filled dynamically -->
+                    <option value="">Sélectionnez un employé</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transfer-amount">Montant à transférer</label>
+                <input type="number" id="transfer-amount" min="1" placeholder="Montant à transférer">
+            </div>
+            <button class="btn btn-primary" id="transfer-btn">
+                <i class="fas fa-exchange-alt"></i> Transférer des fonds
+            </button>
+        </div>
+    </div>
+</div>
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-title">
+                            <i class="fas fa-history"></i> Historique des transactions
+                        </div>
+                        <div class="table-actions">
+                            <input type="text" id="search-transaction" placeholder="Rechercher des transactions...">
+                        </div>
+                    </div>
+                    <table width="100%">
+                        <thead>
+                            <tr>
+                                <th>Date et heure</th>
+                                <th>Type</th>
+                                <th>Montant</th>
+                                <th>Employé</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table">
+                            <!-- Generated dynamically by JavaScript -->
+                            <tr>
+                                <td colspan="5" class="empty-table">Chargement de l'historique des transactions...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="page" id="permissions-page">
+                <header>
+                    <div class="header-title">
+                        <h1><i class="fas fa-key"></i> Autorisations des employés</h1>
+                        <p>Attribuer des droits d'accès spécifiques aux employés</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" id="refresh-permissions-btn">
+                            <i class="fas fa-sync-alt"></i> Actualiser les autorisations
+                        </button>
+                    </div>
+                </header>
+            
+                <div class="permissions-container">
+                    <div class="permissions-selection">
+                        <div class="form-group">
+                            <label for="permissions-employee-select">Select Employé</label>
+                            <select id="permissions-employee-select" class="permissions-select">
+                                <option value="">-- Sélectionnez un employé --</option>
+                                <!-- Employees will be loaded dynamically -->
+                            </select>
+                        </div>
+                    </div>
+            
+                    <div class="permissions-content" id="permissions-content" style="display: none;">
+                        <div class="permissions-card">
+                            <div class="permissions-title">Droits d'accès</div>
+                            <p class="permissions-description">Sélectionnez les fonctionnalités auxquelles cet employé a accès.</p>
+            
+                            <div class="toggle-container">
+                                <p>Accès au tableau de bord</p>
+                                <label class="toggle">
+                                    <input type="checkbox" id="perm-dashboard">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+            
+                            <div class="toggle-container">
+                                <p>Gestion des employés</p>
+                                <label class="toggle">
+                                    <input type="checkbox" id="perm-employees">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+            
+                            <div class="toggle-container">
+                                <p>Finances de la société</p>
+                                <label class="toggle">
+                                    <input type="checkbox" id="perm-society">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+            
+                            <div class="toggle-container">
+                                <p>Examen des candidatures</p>
+                                <label class="toggle">
+                                    <input type="checkbox" id="perm-applications">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+            
+                            <div class="toggle-container">
+                                <p>Embauche et licenciement</p>
+                                <label class="toggle">
+                                    <input type="checkbox" id="perm-hiringfiring">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+            
+                        <div class="save-permissions-container">
+                            <button class="btn btn-primary" id="save-permissions-btn">
+                                <i class="fas fa-save"></i> Enregistrer les autorisations
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Permission Confirmation Modal -->
+            <div class="modal" id="permissions-confirm-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title"><i class="fas fa-key"></i> Confirmer les modifications d'autorisation</div>
+                        <div class="modal-close">&times;</div>
+                    </div>
+                    <div class="modal-body">
+                        <p>Vous êtes sur le point de modifier les autorisations pour <span id="confirm-permissions-employee" class="employee-name">Nom de l'employé</span></p>
+                        <div class="permission-summary" id="permission-summary">
+                            <!-- Summary will be filled dynamically -->
+                        </div>
+                        <div class="warning-box">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Note:</strong> L'octroi de ces autorisations permet à cet employé d'accéder à des fonctionnalités sensibles de gestion des tâches. Choisissez avec soin.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline modal-close-btn">Annuler</button>
+                        <button class="btn btn-primary" id="confirm-permissions-btn">
+                            <i class="fas fa-check-circle"></i> Confirmer les modifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="applications-page">
+                <header>
+                    <div class="header-title">
+                        <h1>Demandes d'emploi</h1>
+                        <p id="applications-count">0 demandes en attente</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" id="refresh-applications-btn">
+                            <i class="fas fa-sync-alt"></i> Actualiser les applications
+                        </button>
+                    </div>
+                </header>
+
+                <div class="applications-container">
+                    <div class="tabs">
+                        <div class="tab active" data-filter="all">Tous</div>
+                        <div class="tab" data-filter="pending">En attente</div>
+                        <div class="tab" data-filter="accepted">Accepté</div>
+                        <div class="tab" data-filter="rejected">Rejeté</div>
+                        <div class="tab" data-filter="finish">Terminer</div>
+                    </div>
+
+                    <input type="text" id="search-application" placeholder="Rechercher des candidatures...">
+
+                    <div class="table-container">
+                        <table width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Date de soumission</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applications-table">
+                                <!-- Generated dynamically by JavaScript -->
+                                <tr>
+                                    <td colspan="4" class="empty-table">Aucune application à afficher</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+<!-- Application Details Modal -->
+<div class="modal" id="application-details-modal">
+    <div class="modal-content application-details-content">
+        <div class="modal-header application-header">
+            <div class="modal-title">
+                <i class="fas fa-file-alt"></i> Détails de la demande
+            </div>
+            <div class="modal-close">&times;</div>
+        </div>
+        <div class="modal-body application-body">
+            <div class="applicant-card">
+                <div class="applicant-info">
+                    <div class="applicant-name-container">
+                        <i class="fas fa-user"></i>
+                        <h3 id="applicant-name">John Doe</h3>
+                    </div>
+                    <div class="applicant-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <p id="application-date">Soumis le : 12/03/2025</p>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-info-circle"></i>
+                            <p id="application-status" class="status-badge">Statut : En attente</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h4 class="section-title">Réponses des candidatures</h4>
+            <div class="application-responses" id="application-responses-container">
+                <!-- Responses will be generated dynamically -->
+            </div>
+            
+            <h4 class="section-title">Notes de révision</h4>
+            <div class="form-group">
+                <textarea id="application-notes" placeholder="Ajouter des notes concernant cette application"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer application-footer">
+            <button class="btn btn-danger" id="reject-application-btn">
+                <i class="fas fa-times-circle"></i> Rejeter
+            </button>
+            <button class="btn btn-outline modal-close-btn">
+                <i class="fas fa-times"></i> Fermer
+            </button>
+            <button class="btn btn-primary" id="accept-application-btn">
+                <i class="fas fa-check-circle"></i> Accepter
+            </button>
+            <button class="btn btn-success" id="finish-application-btn">
+                <i class="fas fa-flag-checkered"></i> Terminer
+            </button>
+        </div>
+    </div>
+</div>
+            <!-- Settings Page -->
+            <div class="page" id="settings-page">
+                <header>
+                    <div class="header-title">
+                        <h1>Paramètres système</h1>
+                        <p>Personnalisez votre expérience de gestion</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" id="reset-settings-btn">
+                            <i class="fas fa-undo"></i> Réinitialiser les paramètres
+                        </button>
+                        <button class="btn btn-primary" id="save-settings-btn">
+                            <i class="fas fa-save"></i> Enregistrer les paramètres
+                        </button>
+                    </div>
+                </header>
+
+                <div class="settings-container">
+                    <div class="settings-card">
+                        <div class="settings-title">Paramètres d'apparence</div>
+
+                        <div class="toggle-container">
+                            <p>Mode sombre</p>
+                            <label class="toggle">
+                                <input type="checkbox" id="darkMode" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <p>Afficher les animations</p>
+                            <label class="toggle">
+                                <input type="checkbox" id="showAnimations" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <p>Vue compacte</p>
+                            <label class="toggle">
+                                <input type="checkbox" id="compactView">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="color-picker">
+                            <label>Couleur du thème</label>
+                            <div class="color-options">
+                                <div class="color-option color-blue active" data-color="blue"></div>
+                                <div class="color-option color-purple" data-color="purple"></div>
+                                <div class="color-option color-green" data-color="green"></div>
+                                <div class="color-option color-red" data-color="red"></div>
+                                <div class="color-option color-orange" data-color="orange"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-title">Paramètres d'affichage</div>
+
+                        <div class="toggle-container">
+                            <p>Afficher le temps de lecture</p>
+                            <label class="toggle">
+                                <input type="checkbox" id="showPlaytime" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-container">
+                            <p>Afficher l'emplacement</p>
+                            <label class="toggle">
+                                <input type="checkbox" id="showLocation" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="refreshInterval">Intervalle de rafraîchissement (secondes)</label>
+                            <input type="number" id="refreshInterval" min="30" max="300" value="60">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notificationSound">Son de notification</label>
+                            <select id="notificationSound">
+                                <option value="none">Aucun</option>
+                                <option value="default" selected>Par Défaut</option>
+                                <option value="alert">Alerte</option>
+                                <option value="chime">Carillon</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="transfer-confirm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-exchange-alt"></i> Confirmer le transfert</div>
+                <div class="modal-close">&times;</div>
+            </div>
+            <div class="modal-body">
+                <p>Vous êtes sur le point d'effectuer un transfert <span id="confirm-transfer-amount"
+                        class="transaction-amount negative">$0</span> à <strong><span
+                            id="confirm-transfer-employee">Nom de l'employé</span></strong></p>
+                <div class="form-group">
+                    <label for="transfer-note">Note (facultative)</label>
+                    <textarea id="transfer-note" placeholder="Add a note for this transaction"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close-btn">Annuler</button>
+                <button class="btn btn-primary" id="confirm-transfer-btn">
+                    <i class="fas fa-check-circle"></i> Confirmer le transfert
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit/Withdraw Confirmation Modal -  -->
+    <div class="modal" id="money-action-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="money-action-title">Confirmer l'action</div>
+                <div class="modal-close">&times;</div>
+            </div>
+            <div class="modal-body">
+                <p id="money-action-message">Êtes-vous sûr de vouloir poursuivre cette transaction ?</p>
+                <div class="form-group">
+                    <label for="money-action-note">Note (facultative)</label>
+                    <textarea id="money-action-note" placeholder="Add a note for this transaction"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close-btn">Annuler</button>
+                <button class="btn btn-primary" id="confirm-money-action-btn">
+                    <i class="fas fa-check-circle"></i> Confirmer
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Employee Modal -->
+    <div class="modal" id="edit-employee-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Modifier un employé</div>
+                <div class="modal-close">&times;</div>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit-name">Nom et prénom</label>
+                    <input type="text" id="edit-name" readonly>
+                    <input type="hidden" id="edit-citizenid">
+                </div>
+                <div class="form-group">
+                    <label for="edit-rank">Rang</label>
+                    <select id="edit-rank">
+                        <!-- Options created dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-note">Note</label>
+                    <textarea id="edit-note" placeholder="Notes sur l'employé"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="fire-employee-btn">Congédier l'employé</button>
+                <button class="btn btn-outline modal-close-btn">Annuler</button>
+                <button class="btn btn-primary" id="save-employee-btn">Enregistrer les modifications</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        Paramètres enregistrés avec succès !
+    </div>
+
+    <div id="custom-fire-menu" class="qb-fire-menu-container" style="display: none;">
+        <div class="qb-fire-menu-header">Employé congédié</div>
+        <div class="qb-fire-menu-message" id="fire-message">
+            Êtes-vous sûr de vouloir licencier cet employé ?
+        </div>
+        <div class="qb-fire-menu-buttons">
+            <div class="qb-fire-menu-button cancel" id="fire-cancel-btn">ANNULER</div>
+            <div class="qb-fire-menu-button confirm" id="fire-confirm-btn">CONGÉDIÉ</div>
+        </div>
+    </div>
+    <div class="modal" id="hire-employee-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-user-plus"></i> Embaucher un nouvel employé</div>
+                <div class="modal-close">&times;</div>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="hire-id">ID du joueur</label>
+                    <input type="number" id="hire-id" placeholder="Entrez l'identifiant du joueur" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="hire-rank">Rang</label>
+                    <select id="hire-rank">
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline modal-close-btn">Annuler</button>
+                <button class="btn btn-primary" id="confirm-hire-btn">
+                    <i class="fas fa-check-circle"></i> Embaucher un employé
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="fire-menu.css">
+    <script src="script.js"></script>
+</body>
+
+</html>
